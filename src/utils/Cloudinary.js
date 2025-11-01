@@ -25,4 +25,4 @@ cloudinary.config({
         }
     }
 
-export {uploadToCloudinary};
+export {uploadOnCloudinary};
