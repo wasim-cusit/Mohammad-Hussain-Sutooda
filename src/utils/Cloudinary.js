@@ -21,7 +21,10 @@ cloudinary.config({
             return response;
             
         } catch (error) {
-            fs.unlinkSync(localFilePath); //remove the file from local storage
+            //remove the file from local storage if it exists
+            if(localFilePath && fs.existsSync(localFilePath)) {
+                fs.unlinkSync(localFilePath);
+            }
             return null;
         }
     }

@@ -5,9 +5,11 @@ import { User } from "../models/user.model.js"
 
 export const verifyJwt = asyncHandler(async (req, _, next) => {
     try {
-        const token = req.cookies?.accessToken || req.header
-        ("Authorization")?.replace("Bearer ", "");
-    
+        // Try to get token from cookies first, then from Authorization header
+        const token = req.cookies?.accessToken || 
+                 req.header("Authorization")?.replace("Bearer ", "");
+        console.log(token);
+        
         if (!token) {
             throw new ApiError(401, "Unauthorized access, token missing");
         }
@@ -17,7 +19,6 @@ export const verifyJwt = asyncHandler(async (req, _, next) => {
         const user = await User.findById(decoded?._id).select("-password -refreshToken");
     
         if (!user) {
-            //Next: discuss about frontend
             throw new ApiError(401, "Invalid token, user not found");
         }
     
