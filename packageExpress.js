@@ -1,21 +1,15 @@
-/**
- * Package Express — shipping quote calculator
- * Prompts for weight and dimensions, validates limits, and prints an estimated total.
- */
+// Author: Mohammad Hussain Sutooda
+// Package Express - shipping quote calculator
 
 import * as readline from "readline";
 
-// Create a readline interface so we can read user input from the terminal (stdin)
+// Set up readline to read input from the keyboard
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-/**
- * Wraps readline.question in a Promise so we can use async/await for each prompt.
- * @param {string} promptText - The message shown before the user types their answer
- * @returns {Promise<string>} - Resolves with the trimmed line the user entered
- */
+// Ask the user a question and return their answer as text
 function ask(promptText) {
   return new Promise((resolve) => {
     rl.question(promptText, (answer) => {
@@ -24,35 +18,23 @@ function ask(promptText) {
   });
 }
 
-/**
- * Parses user input as a number; returns NaN if the value is not a valid number.
- * @param {string} input - Raw string from the prompt
- * @returns {number}
- */
-function parseNumber(input) {
-  return Number(input);
-}
-
-/**
- * Formats a numeric quote as US currency (e.g. 528 -> "$528.00").
- * @param {number} amount
- * @returns {string}
- */
-function formatDollars(amount) {
-  return `$${amount.toFixed(2)}`;
+// Show a prompt on its own line, then read the answer on the next line
+async function askOnNewLine(message) {
+  console.log(message);
+  return ask("");
 }
 
 async function main() {
-  // Required opening message (must be the first line of program output)
+  // First line of output (required by assignment)
   console.log(
     "Welcome to Package Express. Please follow the instructions below."
   );
 
-  // --- Weight ---
-  const weightInput = await ask("Please enter the package weight:");
-  const weight = parseNumber(weightInput);
+  // Get package weight from the user
+  const weightInput = await askOnNewLine("Please enter the package weight:");
+  const weight = Number(weightInput); // convert text input to a number
 
-  // Stop if weight exceeds the maximum allowed for shipping
+  // End program if weight is over 50
   if (weight > 50) {
     console.log(
       "Package too heavy to be shipped via Package Express. Have a good day."
@@ -61,42 +43,34 @@ async function main() {
     return;
   }
 
-  // --- Dimensions (width, height, length) ---
-  const widthInput = await ask("Please enter the package width:");
-  const width = parseNumber(widthInput);
+  // Get width, height, and length
+  const widthInput = await askOnNewLine("Please enter the package width:");
+  const width = Number(widthInput); // package width as a number
 
-  const heightInput = await ask("Please enter the package height:");
-  const height = parseNumber(heightInput);
+  const heightInput = await askOnNewLine("Please enter the package height:");
+  const height = Number(heightInput); // package height as a number
 
-  const lengthInput = await ask("Please enter the package length:");
-  const length = parseNumber(lengthInput);
+  const lengthInput = await askOnNewLine("Please enter the package length:");
+  const length = Number(lengthInput); // package length as a number
 
-  // Sum of all three dimensions must not exceed 50
+  // End program if the sum of dimensions is over 50
   const dimensionTotal = width + height + length;
   if (dimensionTotal > 50) {
-    console.log(
-      "Package too big to be shipped via Package Express."
-    );
+    console.log("Package too big to be shipped via Package Express.");
     rl.close();
     return;
   }
 
-  // Quote = (height × width × length × weight) ÷ 100
-  const volumeTimesWeight = height * width * length * weight;
-  const quote = volumeTimesWeight / 100;
+  // Multiply height, width, length, and weight, then divide by 100 for the quote
+  const quote = (height * width * length * weight) / 100;
 
-  // Show the estimated shipping total in dollars, then close with a thank-you
+  // Show quote as dollars with two decimal places
   console.log(
-    `Your estimated total for shipping this package is: ${formatDollars(quote)}`
+    `Your estimated total for shipping this package is: $${quote.toFixed(2)}`
   );
   console.log("Thank you!");
 
   rl.close();
 }
 
-// Run the program and surface any unexpected errors
-main().catch((err) => {
-  console.error(err);
-  rl.close();
-  process.exit(1);
-});
+main();
